@@ -1,13 +1,7 @@
-import MovieList from "./MovieList";
-import WatchedBox from "./WatchedBox";
+import { ReactNode } from "react";
 
-const Main = () => {
-	return (
-		<main className="main">
-			<MovieList />
-			<WatchedBox />
-		</main>
-	);
+const Main = ({ children }: { children: ReactNode }) => {
+	return <main className="main">{children}</main>;
 };
 
 export default Main;
