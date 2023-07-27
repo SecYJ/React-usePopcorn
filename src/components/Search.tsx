@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 
-const Search = () => {
-	const [query, setQuery] = useState("");
+interface Props {
+	query: string;
+	setQuery: (q: string) => void;
+}
 
+const Search = ({ query, setQuery }: Props) => {
 	return (
 		<input
 			className="search"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "./components/Box";
 import Logo from "./components/Logo";
 import Main from "./components/Main";
@@ -10,6 +10,9 @@ import { IMovie } from "./services/movie";
 import { IWatchMovie } from "./services/watch-movie";
 import WatchedSummary from "./components/WatchedSummary";
 import WatchedMoviesList from "./components/WatchedMoviesList";
+import Loader from "./components/Loader";
+import ErrorMessage from "./components/ErrorMessage";
+// import StarRating from "./components/StarRating";
 
 const tempMovieData = [
 	{
@@ -53,26 +56,73 @@ const tempWatchedData = [
 	},
 ];
 
+const KEY = "5b02a5e0";
+
+interface Response {
+	Search: IMovie[];
+	totalResults: number;
+	Response: string;
+	Error: string;
+}
+
 export default function App() {
-	const [movies, setMovies] = useState<IMovie[]>(tempMovieData);
-	const [watched, setWatched] = useState<IWatchMovie[]>(tempWatchedData);
+	const [movies, setMovies] = useState<IMovie[]>([]);
+	const [watched, setWatched] = useState<IWatchMovie[]>([]);
+	const [query, setQuery] = useState<string>("");
+	// const [movies, setMovies] = useState<IMovie[]>(tempMovieData);
+	// const [watched, setWatched] = useState<IWatchMovie[]>(tempWatchedData);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string>("");
+
+	useEffect(() => {
+		setIsLoading(true);
+		setError("");
+
+		const getMovieData = async () => {
+			try {
+				const res = await fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`);
+				if (!res.ok) throw new Error("Something went wrong, please try again!");
+				const data: Response = await res.json();
+				// console.log(data);
+
+				if (data.Response === "False") throw new Error(data.Error);
+				setMovies(data.Search);
+			} catch (error) {
+				if (error instanceof Error) setError(error.message);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		if (query.length < 3) {
+			setMovies([]);
+			setError("");
+			setIsLoading(false);
+			return;
+		}
+
+		getMovieData();
+	}, [query]);
 
 	return (
 		<>
 			<Navbar>
 				<Logo />
-				<Search />
+				<Search query={query} setQuery={setQuery} />
 				<NumResults count={movies.length} />
 			</Navbar>
 			<Main>
 				<Box>
-					<MovieList movies={movies} />
+					{!isLoading && !error && <MovieList movies={movies} />}
+					{error && <ErrorMessage msg={error} />}
+					{isLoading && <Loader />}
 				</Box>
 				<Box>
 					<WatchedSummary watched={watched} />
 					<WatchedMoviesList watched={watched} />
 				</Box>
 			</Main>
+			{/* <StarRating /> */}
 		</>
 	);
 }
