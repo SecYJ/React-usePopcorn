@@ -1,11 +1,16 @@
 import { IMovie } from "../services/movie";
 import Movie from "./Movie";
 
-const MovieList = ({ movies }: { movies: IMovie[] }) => {
+interface Props {
+	movies: IMovie[];
+	updateSelectedID: (id: string) => void;
+}
+
+const MovieList = ({ movies, updateSelectedID }: Props) => {
 	return (
-		<ul className="list">
+		<ul className="list list-movies">
 			{movies?.map((movie) => (
-				<Movie movie={movie} key={movie.imdbID} />
+				<Movie movie={movie} updateSelectedID={updateSelectedID} key={movie.imdbID} />
 			))}
 		</ul>
 	);

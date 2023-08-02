@@ -2,13 +2,14 @@ import { IWatchMovie } from "../services/watch-movie";
 
 interface Props {
 	movie: IWatchMovie;
+	onDeleteWatched: (id: string) => void;
 }
 
-const WatchedMovie = ({ movie }: Props) => {
+const WatchedMovie = ({ movie, onDeleteWatched }: Props) => {
 	return (
 		<li key={movie.imdbID}>
-			<img src={movie.Poster} alt={`${movie.Title} poster`} />
-			<h3>{movie.Title}</h3>
+			<img src={movie.poster} alt={`${movie.title} poster`} />
+			<h3>{movie.title}</h3>
 			<div>
 				<p>
 					<span>⭐️</span>
@@ -20,8 +21,11 @@ const WatchedMovie = ({ movie }: Props) => {
 				</p>
 				<p>
 					<span>⏳</span>
-					<span>{movie.runtime} min</span>
+					<span>{movie.runtime}</span>
 				</p>
+				<button type="button" className="btn-delete" onClick={() => onDeleteWatched(movie.imdbID)}>
+					X
+				</button>
 			</div>
 		</li>
 	);

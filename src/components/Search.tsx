@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
 	query: string;
@@ -6,6 +6,23 @@ interface Props {
 }
 
 const Search = ({ query, setQuery }: Props) => {
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		const event = (e: KeyboardEvent) => {
+			if (e.code !== "Enter") return;
+			if (document.activeElement === inputRef.current) return;
+			if (inputRef.current) {
+				setQuery("");
+				inputRef.current.focus();
+			}
+		};
+
+		window.addEventListener("keypress", event);
+
+		return () => window.removeEventListener("keypress", event);
+	}, [setQuery]);
+
 	return (
 		<input
 			className="search"
@@ -13,6 +30,7 @@ const Search = ({ query, setQuery }: Props) => {
 			placeholder="Search movies..."
 			value={query}
 			onChange={(e) => setQuery(e.target.value)}
+			ref={inputRef}
 		/>
 	);
 };
